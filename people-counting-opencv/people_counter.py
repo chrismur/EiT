@@ -129,16 +129,18 @@ while True:
 
 		# convert the frame to a blob and pass the blob through the
 		# network and obtain the detections
-		blob = cv2.dnn.blobFromImage(frame, 0.007843, (W, H), 127.5)
+		blob = cv2.dnn.blobFromImage(frame, 0.007843, (W, H), (104,117,123))  #0.007843
 		net.setInput(blob)
 		detections = net.forward()
-
+		print(detections.shape)
+		print(detections[0][0])
 		# loop over the detections
 		for i in np.arange(0, detections.shape[2]):
 			# extract the confidence (i.e., probability) associated
 			# with the prediction
 			confidence = detections[0, 0, i, 2]
-
+			if int(detections[0, 0, i, 1]) >= 0:
+				print(confidence,int(detections[0, 0, i, 1]),CLASSES[int(detections[0, 0, i, 1])])
 			# filter out weak detections by requiring a minimum
 			# confidence
 			if confidence > args["confidence"]:
@@ -248,7 +250,12 @@ while True:
 
 	# construct a tuple of information we will be displaying on the
 	# frame
+	NumPassenger = totalDown-totalUp
+	if NumPassenger < 0:
+		NumPassenger = 0
+
 	info = [
+		("Number of passengers", NumPassenger),
 		("Up", totalUp),
 		("Down", totalDown),
 		("Status", status),
